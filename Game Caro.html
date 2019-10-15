@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Game Caro</title>
+
+</head>
+<body>
+<div id="iddiv" style="position: absolute;margin-top: 50px"></div>
+<button onclick="replay()">Replay</button>
+<script>
+    function Cell(x, y) {
+        this.x = x;
+        this.y = y;
+        this.value = 1;
+        this.getHtml = function () {
+            let top = 20 * x;
+            let left = 20 * y;
+            let cellHtml = '<div id="cell' + x + '-' + y + '" onclick="gameBoard.play(' + x + ',' + y + ')" style="position: absolute;width: 20px;height: 20px;left: ' + top + 'px;top: ' + left + 'px;line-height: 18px;border: 1px solid black;text-align: center"></div>';
+            return cellHtml;
+        }
+    }
+
+    function GameBoard() {
+        this.turn = true;
+        this.isOver = true;
+        this.cells = [];
+        this.draw = function () {
+
+            document.getElementById('iddiv').innerHTML = '';
+            for (i = 0; i < 20; i++) {
+                let row = [];
+                this.cells.push(row);
+                for (j = 0; j < 20; j++) {
+                    let cell = new Cell(i, j);
+                    row.push(cell);
+                    document.getElementById('iddiv').innerHTML += cell.getHtml();
+                }
+            }
+        };
+        this.play = function (x, y) {
+            if (!this.isOver) {
+                return;
+            }
+            let a = document.getElementById('cell' + x + '-' + y + '');
+            if (this.cells[x][y].value === 1 && this.turn) {
+                this.cells[x][y].value = 2;
+                a.innerHTML = 'X';
+                this.turn = false;
+            } else if (this.cells[x][y].value === 1 && !this.turn) {
+                this.cells[x][y].value = 3;
+                a.innerHTML = 'O';
+                this.turn = true;
+            } else {
+                alert('ô không trống');
+            }
+            this.check(x, y);
+        };
+        this.check = function (x, y) {
+            let cell = this.cells[x][y];
+            //Dọc
+            let count = 1;
+            let i = 1;
+            while ((x + i) < 20 && this.cells[x + i][y].value === cell.value) {
+                count++;
+                i++;
+            }
+            i = 1;
+            while ((x - i) >= 0 && this.cells[x - i][y].value === cell.value) {
+                count++;
+                i++;
+            }
+            this.endGame(count);
+            //Ngang
+            count = 1;
+            i = 1;
+            while ((y - i) >= 0 && this.cells[x][y - i].value === cell.value) {
+                count++;
+                i++;
+            }
+            i = 1;
+            while ((y + i) < 20 && this.cells[x][y + i].value === cell.value) {
+                count++;
+                i++;
+            }
+            this.endGame(count);
+            //Chéo xuống
+            count = 1;
+            i = 1;
+            while ((x + i) < 20 && (y + i) < 20 && this.cells[x + i][y + i].value === cell.value) {
+                count++;
+                i++
+            }
+            i = 1;
+            while ((x - i) >= 0 && (y - i) >= 0 && this.cells[x - i][y - i].value === cell.value) {
+                count++;
+                i++
+            }
+            this.endGame(count);
+            //chéo lên
+            count = 1;
+            i = 1;
+            while ((x - i) >= 0 && (y + i) < 20 && this.cells[x - i][y + i].value === cell.value) {
+                count++;
+                i++
+            }
+            i = 1;
+            while ((x + i) < 20 && (y - i) >= 0 && this.cells[x + i][y - i].value === cell.value) {
+                count++;
+                i++
+            }
+            this.endGame(count);
+        };
+        this.endGame = function (count) {
+            if (count >= 5) {
+                alert('you win');
+                this.isOver = false;
+            }
+        }
+    }
+    function replay() {
+        gameBoard.cells = [];
+        gameBoard.draw();
+        gameBoard.isOver = true;
+        gameBoard.turn = true;
+    }
+    let gameBoard = new GameBoard();
+    gameBoard.draw();
+</script>
+</body>
+</html>
